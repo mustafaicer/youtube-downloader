@@ -14,7 +14,7 @@ class App(ctk.CTk):
         self.configure(padx=20,pady=20)
 
         self.youtube_downloader_folder = os.path.expanduser("~\\Desktop\\Youtube Downloader")
-        self.ffmpeg_path = os.path.join(os.getcwd(), 'ffmpeg.exe')
+        self.ffmpeg_path = os.path.join(os.getcwd(), 'ffmpeg.exe') # You need ffmpeg.exe 
 
         self.text_font = ('Arial', 18, 'normal')
         self.info_font = ('Arial',20,'bold')
