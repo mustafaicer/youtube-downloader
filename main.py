@@ -14,11 +14,12 @@ class App(ctk.CTk):
         self.configure(padx=20,pady=20)
 
         self.youtube_downloader_folder = os.path.expanduser("~\\Desktop\\Youtube Downloader")
-        self.ffmpeg_path = os.path.join(os.getcwd(), 'ffmpeg.exe') # You need ffmpeg.exe 
+        self.ffmpeg_path = os.path.join(os.getcwd(), 'ffmpeg.exe')
 
         self.text_font = ('Arial', 18, 'normal')
         self.info_font = ('Arial',20,'bold')
         self.error_font = ('Arial',9,'normal')
+        self.show_path_font = ('Arial',15,'normal')
 
         self.file_name = None
         self.audio_url = None
@@ -36,15 +37,15 @@ class App(ctk.CTk):
         self.link_entry = ctk.CTkEntry(self,width=360)
         self.link_entry.place(relx=0.3,rely=0.15)
 
-        self.download_mp3_button = ctk.CTkButton(self,text="Download Mp3",font=self.text_font,command=self.start_download_mp3)
-        self.download_mp3_button.place(relx=0.35,rely=0.33,anchor=ctk.CENTER)
+        self.download_audio_button = ctk.CTkButton(self,text="Download Audio",font=self.text_font,command=self.start_download_audio)
+        self.download_audio_button.place(relx=0.35,rely=0.33,anchor=ctk.CENTER)
 
-        self.download_mp4_button = ctk.CTkButton(self, text="Download Mp4", font=self.text_font,command=self.start_download_mp4)
-        self.download_mp4_button.place(relx=0.65, rely=0.33,anchor=ctk.CENTER)
+        self.download_video_button = ctk.CTkButton(self, text="Download Video", font=self.text_font,command=self.start_download_video)
+        self.download_video_button.place(relx=0.65, rely=0.33,anchor=ctk.CENTER)
 
         self.info_label = ctk.CTkLabel(self,font=self.info_font)
 
-        self.show_path = ctk.CTkLabel(self,font=self.text_font)
+        self.show_path = ctk.CTkLabel(self,font=self.show_path_font)
         self.error_label = ctk.CTkLabel(self,font=self.error_font)
 
         self.open_file_in_folder_button = ctk.CTkButton(self,text="Open file in folder",font=self.text_font,command=self.open_file_in_folder)
@@ -58,7 +59,15 @@ class App(ctk.CTk):
         self.file_name_entry.delete(0, ctk.END)
         self.link_entry.delete(0, ctk.END)
 
-    def download_mp3(self):
+    def delete_info(self):
+        self.info_label.configure(text="Wait", text_color="light blue")
+        self.info_label.place(relx=0.5, rely=0.50, anchor=ctk.CENTER)
+        if self.show_path is not None:
+            self.show_path.configure(text="")
+        if self.error_label is not None:
+            self.error_label.configure(text="")
+
+    def download_audio(self):
         self.audio_url = self.link_entry.get()
         self.file_name = self.file_name_entry.get()
 
@@ -95,23 +104,19 @@ class App(ctk.CTk):
         finally:
             self.finally_work()
 
-    def start_download_mp3(self):
-        thread = threading.Thread(target=self.download_mp3)
-
-        self.info_label.configure(text="Wait", text_color="light blue")
-        self.info_label.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
-
+    def start_download_audio(self):
+        thread = threading.Thread(target=self.download_audio)
+        self.delete_info()
         thread.start()
 
-    def download_mp4(self):
+    def download_video(self):
         self.video_url = self.link_entry.get()
         self.file_name = self.file_name_entry.get()
 
         try:
             ydl_options = {
-                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
-                'outtmpl': os.path.join(self.youtube_downloader_folder, f"{self.file_name}"),
-                'merge_output_format': 'mp4',
+                'format': 'mp4',
+                'outtmpl': os.path.join(self.youtube_downloader_folder, f"{self.file_name}.mp4"),
                 'postprocessors': [{
                     'key': 'FFmpegVideoConvertor',
                     'preferedformat': 'mp4',
@@ -136,12 +141,9 @@ class App(ctk.CTk):
         finally:
             self.finally_work()
 
-    def start_download_mp4(self):
-        thread = threading.Thread(target=self.download_mp4)
-
-        self.info_label.configure(text="Wait", text_color="light blue")
-        self.info_label.place(relx=0.5, rely=0.50, anchor=ctk.CENTER)
-
+    def start_download_video(self):
+        thread = threading.Thread(target=self.download_video)
+        self.delete_info()
         thread.start()
 
     def open_file_in_folder(self):
